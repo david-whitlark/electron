@@ -1284,6 +1284,15 @@ void WebContents::SendInputEvent(v8::Isolate* isolate,
       host->ForwardWheelEvent(mouse_wheel_event);
       return;
     }
+  } else if (blink::WebInputEvent::isTouchEventType(type)) {
+    blink::WebTouchEvent touch_event;
+    if (mate::ConvertFromV8(isolate, input_event, &touch_event)) {
+      const auto host_impl = static_cast<content::RenderWidgetHostImpl*>(host);
+      if (host_impl) {
+        host_impl->ForwardEmulatedTouchEvent(touch_event, true);
+      }
+      return;
+    }
   }
 
   isolate->ThrowException(v8::Exception::Error(mate::StringToV8(

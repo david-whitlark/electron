@@ -282,6 +282,80 @@ bool Converter<blink::WebMouseWheelEvent>::FromV8(
   return true;
 }
 
+template<>
+struct Converter<blink::WebTouchPoint::State> {
+  static bool FromV8(v8::Isolate* isolate, v8::Handle<v8::Value> val,
+                     blink::WebTouchPoint::State* out) {
+    std::string type = base::ToLowerASCII(V8ToString(val));
+
+    *out = blink::WebTouchPoint::StateUndefined;
+    if (type == "released")
+      *out = blink::WebTouchPoint::StateReleased;
+    else if (type == "pressed")
+      *out = blink::WebTouchPoint::StatePressed;
+    else if (type == "moved")
+      *out = blink::WebTouchPoint::StateMoved;
+    else if (type == "stationary")
+      *out = blink::WebTouchPoint::StateStationary;
+    else if (type == "cancelled")
+      *out = blink::WebTouchPoint::StateCancelled;
+
+    return true;
+  }
+};
+
+template<>
+struct Converter<blink::WebTouchPoint> {
+  static bool FromV8(v8::Isolate* isolate, v8::Handle<v8::Value> val,
+                     blink::WebTouchPoint* out) {
+    mate::Dictionary dict;
+    if (!ConvertFromV8(isolate, val, &dict))
+      return false;
+
+    // may allow changing these in the future
+    out->tiltX = 0;
+    out->tiltY = 0;
+    out->force = 1.f;
+    out->rotationAngle = 0.f;
+    out->pointerType = blink::WebPointerProperties::PointerType::Touch;
+
+    // core set of values to set
+    if (!dict.Get("id", &out->id)) out->id = 0;
+    if (!dict.Get("state", &out->state)) out->state = blink::WebTouchPoint::StateStationary;
+    if (!dict.Get("radiusX", &out->radiusX)) out->radiusX = 16.f;
+    if (!dict.Get("radiusY", &out->radiusY)) out->radiusY = 16.f;
+    if (!dict.Get("clientX", &out->position.x)) out->position.x = 0;
+    if (!dict.Get("clientY", &out->position.y)) out->position.y = 0;
+    if (!dict.Get("screenX", &out->screenPosition.x)) out->screenPosition.x = 0;
+    if (!dict.Get("screenY", &out->screenPosition.y)) out->screenPosition.y = 0;
+
+    return true;
+  }
+};
+
+bool Converter<blink::WebTouchEvent>::FromV8(
+    v8::Isolate* isolate, v8::Local<v8::Value> val,
+    blink::WebTouchEvent* out) {
+  mate::Dictionary dict;
+  if (!ConvertFromV8(isolate, val, &dict))
+    return false;
+  if (!ConvertFromV8(isolate, val, static_cast<blink::WebInputEvent*>(out)))
+    return false;
+
+  out->touchesLength = 0;
+  std::vector<blink::WebTouchPoint> touches;
+  if (dict.Get("touches", &touches)) {
+    out->touchesLength = touches.size();
+    if (out->touchesLength > blink::WebTouchEvent::touchesLengthCap)
+      out->touchesLength = blink::WebTouchEvent::touchesLengthCap;
+    for (size_t i=0; i<out->touchesLength; ++i) {
+      out->touches[i] = touches[i];
+    }
+  }
+
+  return true;
+}
+
 bool Converter<blink::WebFloatPoint>::FromV8(
     v8::Isolate* isolate, v8::Local<v8::Value> val, blink::WebFloatPoint* out) {
   mate::Dictionary dict;
