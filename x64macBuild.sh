@@ -1,5 +1,5 @@
 #!/bin/bash
-SET npm_config_arch=x64
+export npm_config_arch=x64
 
 # get chrome driver
 python script/bootstrap.py -v
