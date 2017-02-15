@@ -1,5 +1,9 @@
 SET npm_config_arch=x64
 
+rem get chrome driver
+python script\bootstrap.py -v
+
+rem point to custom build
 python script\bootstrap.py -v ^
 --target_arch=x64 ^
 --libcc_source_path=..\libchromiumcontent\x64dist\main\src ^

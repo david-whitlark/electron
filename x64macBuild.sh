@@ -1,6 +1,10 @@
 #!/bin/bash
 SET npm_config_arch=x64
 
+# get chrome driver
+python script/bootstrap.py -v
+
+# point to custom build
 python script/bootstrap.py -v \
 --target_arch=x64 \
 --libcc_source_path=../libchromiumcontent/dist/main/src \
