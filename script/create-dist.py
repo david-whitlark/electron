@@ -79,7 +79,7 @@ def main():
   rm_rf(DIST_DIR)
   os.makedirs(DIST_DIR)
 
-  force_build()
+  # force_build()
   create_symbols()
   copy_binaries()
   copy_chrome_binary('chromedriver')

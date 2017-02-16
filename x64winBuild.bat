@@ -1,7 +1,9 @@
 SET npm_config_arch=x64
+python script\clean.py
 
 rem get chrome driver
-python script\bootstrap.py -v
+python script\bootstrap.py -v ^
+--target_arch=x64
 
 rem point to custom build
 python script\bootstrap.py -v ^

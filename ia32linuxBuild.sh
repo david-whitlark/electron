@@ -1,8 +1,10 @@
 #!/bin/bash
 export npm_config_arch=ia32
+python script/clean.py
 
 # get chrome driver
-python script/bootstrap.py -v
+python script/bootstrap.py -v \
+--target_arch=ia32
 
 # point to custom build
 python script/bootstrap.py -v \
